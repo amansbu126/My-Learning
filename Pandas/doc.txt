@@ -1,0 +1,72 @@
+That error — `(unicode error) 'unicodeescape' codec can't decode bytes in position 2-3:` — usually happens in **Python** when you're working with **Windows-style file paths** (like `C:\Users\Name\Documents\file.txt`) using **raw strings**, or just regular strings without properly escaping backslashes (`\`).
+
+---
+
+### 🔍 What’s Going On?
+
+Python uses backslashes `\` in strings to represent **escape characters**. For example:
+- `\n` = newline
+- `\t` = tab
+
+So when Python sees a string like:  
+```python
+path = "C:\newfolder\data.txt"
+```
+It interprets `\n` as a newline and tries to process `\d`, etc., which often leads to the `'unicodeescape' codec can't decode` error — because some of these aren't valid escape sequences.
+
+---
+
+### ✅ How to Fix It
+
+You have **3 options** to fix this:
+
+---
+
+#### ✅ 1. **Use a Raw String**
+Add an `r` before the string to tell Python **not to treat backslashes as escape characters**:
+```python
+path = r"C:\newfolder\data.txt"
+```
+
+---
+
+#### ✅ 2. **Escape Each Backslash**
+Double every backslash (`\\`) so Python treats them literally:
+```python
+path = "C:\\newfolder\\data.txt"
+```
+
+---
+
+#### ✅ 3. **Use Forward Slashes**
+Python understands forward slashes on all operating systems, including Windows:
+```python
+path = "C:/newfolder/data.txt"
+```
+
+---
+
+### 💡 Example That Causes the Error
+
+```python
+with open("C:\newfolder\data.txt") as f:
+    content = f.read()
+```
+
+🔴 Error:
+```
+(unicode error) 'unicodeescape' codec can't decode bytes in position 2-3: truncated \uXXXX escape
+```
+
+---
+
+### ✅ Fixed Version
+
+```python
+with open(r"C:\newfolder\data.txt") as f:
+    content = f.read()
+```
+
+---
+
+Let me know if you want to dive deeper into how Unicode and escape characters work in Python.
