@@ -1,0 +1,19 @@
+NaN (Not a number)
+None (for object data types)
+
+isnull()
+True - value is missing-> NaN
+False - value is present
+
+isnull().sum()
+
+dropna()
+
+df.dropna(axis=1,inplace=True)
+axis=1 -> remove column
+axis=0 -> remove rows
+inplace=True -> modeification of original dataframe
+
+
+fillna()
+fillna(value,inplace=True)
