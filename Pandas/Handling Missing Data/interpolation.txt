@@ -1,0 +1,16 @@
+it provides estimated values
+
+10
+20
+Nan->30
+30
+40
+50
+
+Linear, polinomial
+
+1-> preserve data integrity -> missing values can be replace with arbitary number
+2-> smooth trends -> can be helpful in time series
+3-> avoid data loss
+
+interpolate()
