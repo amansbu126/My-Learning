@@ -12,3 +12,6 @@ print(df)
 
 grouped = df.groupby("Channel")["Spend"].sum()
 print(grouped)
+
+grouped_channel_Campaign=df.groupby(["Channel","Campaign"])["Spend"].sum()
+print(grouped_channel_Campaign)
