@@ -14,3 +14,13 @@ Linear, polinomial
 3-> avoid data loss
 
 interpolate()
+
+
+when to use iterpolation
+1-> time series data
+2-> numeric data with trends
+3-> avoid dropping rows
+4-> unable to work with categorical data
+
+
+** learn about linear how it works in interpolation
