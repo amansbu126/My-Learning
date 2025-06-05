@@ -1,0 +1,52 @@
+
+SWAP:
+----------------------------------------
+arr[i], arr[min] = arr[min], arr[i]
+----------------------------------------
+
+with a real example, step-by-step — and I'll show you exactly how Python handles it using a temporary tuple.
+
+🔢 Example:
+Suppose:
+
+arr = [13, 46, 24, 52, 20, 9]
+
+i = 0    # index of i   value (13)
+min = 5  # index of min value (9)
+
+So you're trying to swap arr[0] and arr[5]:
+
+arr[0] = 13
+
+arr[5] = 9
+
+🧠 Step-by-Step Breakdown
+1. Right-hand side is evaluated first:
+
+(arr[min], arr[i]) → (9, 13)
+Python creates a temporary tuple:
+
+python
+
+temp = (9, 13)
+
+2. Tuple is unpacked and assigned to left-hand side:
+
+arr[i] = temp[0] → arr[0] = 9
+arr[min] = temp[1] → arr[5] = 13
+
+Now your array becomes:
+
+arr = [9, 46, 24, 52, 20, 13]
+
+✅ So what's the benefit?
+If you had written it like this:
+
+arr[i] = arr[min]  # arr[0] = 9
+arr[min] = arr[i]  # arr[5] = 9 (Oops! now both are 9)
+You would lose the original value at arr[i] (which was 13). That's why Python uses a tuple internally to hold both values safely before reassigning.
+
+📌 In Summary:
+Python evaluates the right-hand side first, creating a temporary tuple.
+
+Then it unpacks that tuple and assigns values to the left-hand side, ensuring correct swapping.
