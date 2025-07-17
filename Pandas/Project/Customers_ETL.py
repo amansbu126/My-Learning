@@ -1,18 +1,16 @@
-from airflow import DAG
-from airflow.operators.python import PythonOperator
-from datetime import datetime
-import pandas as pd
+from openpyxl import load_workbook
 from sqlalchemy import create_engine, text
+import pymysql
 
-# --- ETL Function ---
 def run_etl():
-    EXCEL_FILE = "/mnt/c/Users/Aman Kumar/Downloads/Ex_Files_ETL_Python_SQL/Ex_Files_ETL_Python_SQL/Exercise Files/Chapter_2/H+ Sport Customers.xlsx"
+    EXCEL_FILE = "C:/Users/Aman Kumar/Downloads/Ex_Files_ETL_Python_SQL/Ex_Files_ETL_Python_SQL/Exercise Files/Chapter_2/H+ Sport Customers.xlsx"
     DB_USER = "root"
     DB_PASSWORD = "aman"
     DB_HOST = "localhost"
     DB_PORT = 3306
     DB_NAME = "HR"
 
+    # Step 1: Connect to MySQL
     try:
         engine = create_engine(f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
         with engine.connect() as conn:
@@ -23,28 +21,34 @@ def run_etl():
         print("❌ Failed to connect to MySQL:", e)
         return
 
+    # Step 2: Read Excel File (openpyxl)
     try:
-        df = pd.read_excel(EXCEL_FILE)
-        print(f"🔍 Read {len(df)} rows from Excel.")
+        wb = load_workbook(EXCEL_FILE)
+        sheet = wb.active
+        headers = list(next(sheet.iter_rows(min_row=1, max_row=1, values_only=True)))  # ✅ get header values directly
+        rows = list(sheet.iter_rows(min_row=2, values_only=True))  # ✅ get all data rows directly
+
+        print(f"🔍 Read {len(rows)} rows from Excel.")
     except Exception as e:
         print("❌ Failed to read Excel file:", e)
         return
 
+    # Step 3: Insert into MySQL
     try:
-        df.to_sql("customers", con=engine, if_exists="append", index=False)
+        # Convert headers to backticked column names for SQL safety
+        column_list = ", ".join([f"`{col}`" for col in headers])
+        placeholders = ", ".join([f":{col}" for col in headers])
+        insert_stmt = text(f"INSERT INTO customers ({column_list}) VALUES ({placeholders})")
+
+        with engine.begin() as conn:
+            for row in rows:
+                row_dict = dict(zip(headers, row))
+                conn.execute(insert_stmt, row_dict)
+
         print("✅ Data loaded into MySQL table 'customers'.")
     except Exception as e:
         print("❌ Failed to load data into MySQL:", e)
 
-# --- Airflow DAG Definition ---
-with DAG(
-    dag_id="customers_etl_dag",
-    start_date=datetime(2023, 1, 1),
-    schedule_interval="@daily",
-    catchup=False,
-    tags=["ETL", "Excel", "MySQL"],
-) as dag:
-    task_run_etl = PythonOperator(
-        task_id="run_excel_to_mysql_etl",
-        python_callable=run_etl
-    )
+# --- Run ---
+if __name__ == "__main__":
+    run_etl()
